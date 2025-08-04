@@ -39,11 +39,17 @@ public function login(Request $request) {
         ]);
     }
 
-    return response()->json(['message' => 'Login successful']);
+    $token = $user->createToken('app_token')->plainTextToken;
+
+    return response()->json([
+            'user' => $user,
+            'token' => $token,
+        'message' => 'Login successful']);
 }
 
-public function logout(Request $request) {
-    auth()->guard('web')->logout();
+public function logout(Request $request)
+{
+    $request->user()->currentAccessToken()->delete(); // revoke token
     return response()->json(['message' => 'Logged out']);
 }
 }
