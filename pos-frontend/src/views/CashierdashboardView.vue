@@ -1,7 +1,7 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold">Welcome to the Dashboard</h1>
-    <p>You are logged in but who is you nigga? you arent an admin or cashier?? WHO IS YOU???.</p>
+    <h1 class="text-2xl font-bold">Welcome to the Cashier Dashboard</h1>
+    <p>You are a cashier? Get yo money up</p>
 
     <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-white rounded">
       Logout
@@ -29,4 +29,3 @@ const logout = async () => {
   }
 }
 </script>
-

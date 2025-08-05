@@ -24,14 +24,26 @@ const login = async () => {
     });
 
     const token = res.data.token;
+    const role = res.data.user.role;
+
 
     // Save token
     localStorage.setItem('token', token);
+    // Save role
+    localStorage.setItem('role', role);
     // Set axios default header
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
+    // Role-based redirect
     console.log('Login success:', res.data);
-    router.push('/dashboard') // ✅ redirect after login
+    if (role === 'admin') {
+     router.push('/admindashboard');
+     } else if (role === 'cashier') {
+     router.push('/cashierdashboard');
+     } else {
+      router.push('/dashboard'); // fallback
+     }
+   // router.push('/dashboard') // ✅ redirect after login
   } catch (err) {
     console.error('Login error:', err.response);
   }

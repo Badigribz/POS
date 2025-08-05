@@ -41,10 +41,16 @@ public function login(Request $request) {
 
     $token = $user->createToken('app_token')->plainTextToken;
 
-    return response()->json([
-            'user' => $user,
-            'token' => $token,
-        'message' => 'Login successful']);
+   return response()->json([
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ],
+        'token' => $token,
+        'message' => 'Login successful'
+    ]);
 }
 
 public function logout(Request $request)
