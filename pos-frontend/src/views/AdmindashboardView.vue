@@ -24,11 +24,30 @@
       <tbody>
         <tr v-for="product in products" :key="product.id">
           <td class="border p-2">{{ product.id }}</td>
-          <td class="border p-2">{{ product.name }}</td>
-          <td class="border p-2">{{ product.price }}</td>
-          <td class="border p-2">{{ product.quantity }}</td>
+          <td class="border p-2" v-if="editId !== product.id">{{ product.name }}</td>
+          <td class="border p-2" v-else>
+            <input v-model="editProduct.name" class="border p-1" />
+          </td>
+
+          <td class="border p-2" v-if="editId !== product.id">{{ product.price }}</td>
+          <td class="border p-2" v-else>
+            <input v-model="editProduct.price" type="number" class="border p-1" />
+          </td>
+
+          <td class="border p-2" v-if="editId !== product.id">{{ product.quantity }}</td>
+          <td class="border p-2" v-else>
+            <input v-model="editProduct.quantity" type="number" class="border p-1" />
+          </td>
+
           <td class="border p-2">
-            <button @click="deleteProduct(product.id)" class="bg-red-500 text-white px-2 py-1">Delete</button>
+            <template v-if="editId === product.id">
+              <button @click="updateProduct(product.id)" class="bg-blue-500 text-white px-2 py-1 mr-2">Save</button>
+              <button @click="cancelEdit" class="bg-gray-500 text-white px-2 py-1">Cancel</button>
+            </template>
+            <template v-else>
+              <button @click="startEdit(product)" class="bg-yellow-500 text-white px-2 py-1 mr-2">Edit</button>
+              <button @click="deleteProduct(product.id)" class="bg-red-500 text-white px-2 py-1">Delete</button>
+            </template>
           </td>
         </tr>
       </tbody>
@@ -52,6 +71,9 @@ const newProduct = ref({
   price: '',
   quantity: ''
 })
+
+const editId = ref(null)
+const editProduct = ref({ name: '', price: '', quantity: '' })
 
 // Fetch products
 const getProducts = async () => {
@@ -81,6 +103,29 @@ const deleteProduct = async (id) => {
     getProducts() // Refresh list
   } catch (err) {
     console.error('Error deleting product:', err)
+  }
+}
+
+// Start editing
+const startEdit = (product) => {
+  editId.value = product.id
+  editProduct.value = { ...product }
+}
+
+// Cancel edit
+const cancelEdit = () => {
+  editId.value = null
+  editProduct.value = { name: '', price: '', quantity: '' }
+}
+
+// Update product
+const updateProduct = async (id) => {
+  try {
+    await axios.put(`/api/products/${id}`, editProduct.value)
+    editId.value = null
+    getProducts()
+  } catch (err) {
+    console.error('Error updating product:', err)
   }
 }
 
