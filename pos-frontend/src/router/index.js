@@ -4,6 +4,7 @@ import RegisterView from '@/views/RegisterView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import AdmindashboardView from '@/views/AdmindashboardView.vue'
 import CashierdashboardView from '@/views/CashierdashboardView.vue'
+import CashiersaleView from '@/views/CashiersaleView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,6 +14,7 @@ const router = createRouter({
     { path: '/dashboard', component: DashboardView, meta: { requiresAuth: true } },
     { path: '/admindashboard', component: AdmindashboardView, meta: { requiresAuth: true } },
     { path: '/cashierdashboard', component: CashierdashboardView, meta: { requiresAuth: true } },
+    { path: '/cashiersale', component: CashiersaleView,}
   ],
 });
 
