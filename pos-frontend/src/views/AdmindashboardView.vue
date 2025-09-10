@@ -7,7 +7,7 @@
       <input v-model="newProduct.name" type="text" placeholder="Product Name" class="border p-2 mr-2" />
       <input v-model="newProduct.price" type="number" placeholder="Price" step="0.01" class="border p-2 mr-2" />
       <input v-model="newProduct.quantity" type="number" placeholder="Quantity" class="border p-2 mr-2" />
-      <button type="submit" class="bg-green-500 text-white px-4 py-2">Add</button>
+      <button type="submit" class="bg-green-500 text-black px-4 py-2">Add</button>
     </form>
 
     <!-- Product List -->
@@ -41,19 +41,19 @@
 
           <td class="border p-2">
             <template v-if="editId === product.id">
-              <button @click="updateProduct(product.id)" class="bg-blue-500 text-white px-2 py-1 mr-2">Save</button>
-              <button @click="cancelEdit" class="bg-gray-500 text-white px-2 py-1">Cancel</button>
+              <button @click="updateProduct(product.id)" class="bg-blue-500 text-black px-2 py-1 mr-2">Save</button>
+              <button @click="cancelEdit" class="bg-gray-500 text-black px-2 py-1">Cancel</button>
             </template>
             <template v-else>
-              <button @click="startEdit(product)" class="bg-yellow-500 text-white px-2 py-1 mr-2">Edit</button>
-              <button @click="deleteProduct(product.id)" class="bg-red-500 text-white px-2 py-1">Delete</button>
+              <button @click="startEdit(product)" class="bg-yellow-500 text-black px-2 py-1 mr-2">Edit</button>
+              <button @click="deleteProduct(product.id)" class="bg-red-500 text-black px-2 py-1">Delete</button>
             </template>
           </td>
         </tr>
       </tbody>
     </table>
 
-    <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-white rounded">
+    <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-black rounded">
       Logout
     </button>
   </div>
