@@ -52,7 +52,12 @@
         </tr>
       </tbody>
     </table>
-
+<router-link
+  to="/adminsalesreport"
+  class="mt-4 px-4 py-2 bg-red-600 text-black rounded"
+>
+  Sales Report
+</router-link>
     <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-black rounded">
       Logout
     </button>
