@@ -22,7 +22,7 @@
   <v-main>
   <v-container class="mt-5">
     <v-sheet class="mx-auto pa-6" max-width="900" elevation="12">
-      <h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
+      <h1 class="text-2xl text-center font-bold mb-4">Admin Dashboard</h1>
 
       <!-- Add Product Form -->
       <v-form @submit.prevent="addProduct" class="mb-6">

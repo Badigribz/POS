@@ -22,7 +22,10 @@
       <v-main>
         <v-container class="mt-6">
           <v-card elevation="6" class="pa-4">
-            <v-card-title class="text-h5 font-weight-bold">Sales Report</v-card-title>
+            <v-card-title class="text-h5 font-weight-bold text-center justify-center">
+              Sales Report
+            </v-card-title>
+
             <v-card-text>
 
               <!-- Loading State -->
@@ -58,7 +61,7 @@
               </v-data-table>
 
               <!-- Totals -->
-              <div v-if="sales.length > 0" class="mt-4 text-right font-weight-bold">
+              <div v-if="sales.length > 0" class="mt-4 text-center font-weight-bold">
                 Total Revenue: Ksh {{ totalRevenue.toFixed(2) }} <br />
                 Total Sales: {{ totalSales }}
               </div>

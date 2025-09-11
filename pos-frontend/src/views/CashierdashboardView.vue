@@ -24,12 +24,12 @@
     <v-main>
       <v-container>
         <v-card elevation="6" class="pa-4 mt-4">
-          <v-card-title class="text-h5 font-weight-bold">Cashier POS</v-card-title>
+          <v-card-title class="text-h5 text-center font-weight-bold">Cashier Dashboard</v-card-title>
 
           <v-divider class="mb-4"></v-divider>
 
           <!-- Products Table -->
-          <v-card-subtitle class="mb-2">Available Products</v-card-subtitle>
+          <v-card-subtitle class="mb-2 text-center">Available Products</v-card-subtitle>
           <v-data-table
             :headers="productHeaders"
             :items="products"
@@ -50,7 +50,7 @@
           </v-data-table>
 
           <!-- Cart Section -->
-          <v-card-subtitle class="mb-2">Cart</v-card-subtitle>
+          <v-card-subtitle class="mb-2 text-center">Cart</v-card-subtitle>
           <v-data-table
             :headers="cartHeaders"
             :items="cart"
