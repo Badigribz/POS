@@ -1,46 +1,90 @@
 <template>
-  <div class="max-w-md mx-auto p-4 border rounded mt-10">
-    <h2 class="text-xl font-bold mb-4">Register</h2>
+      <v-app>
+    <v-app-bar app color="blue" dense>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-items class="hidden-sm-and-down" v-show="!isLoggedIn">
+          <v-btn text :to="{ path: '/login'}">Login</v-btn>
+          <v-btn text :to="{ path: '/'}">Signup</v-btn>
+      </v-toolbar-items>
+      <CartIcon v-show="!isLoggedIn"/>
+      {{ isLoggedIn }}
+      <v-btn text @click="logout" v-show="isLoggedIn">Logout</v-btn>
+    </v-app-bar>
 
-    <form @submit.prevent="register">
-      <div class="mb-4">
-        <label class="block mb-1">Name</label>
-        <input v-model="form.name" type="text" class="w-full p-2 border rounded" required />
-      </div>
+   <v-navigation-drawer app v-model="drawer" temporary>
+    <v-list>
+      <v-list-item link :to="{ path: '/login' }"><v-list-item-title>Login</v-list-item-title></v-list-item>
+      <!-- <v-list-item link :to="{ path:'/signup' }"><v-list-item-title>Signup</v-list-item-title></v-list-item> -->
+    </v-list>
+   </v-navigation-drawer>
 
-      <div class="mb-4">
-        <label class="block mb-1">Email</label>
-        <input v-model="form.email" type="email" class="w-full p-2 border rounded" required />
-      </div>
 
-      <div class="mb-4">
-        <label class="block mb-1">Password</label>
-        <input v-model="form.password" type="password" class="w-full p-2 border rounded" required />
-      </div>
+  <v-main>
+    <v-sheet
+       class="mx-auto pa-12 mt-5"
+       max-width="500"
+       elevation="12">
+       <v-form @submit.prevent="register">
+        <v-text-field
+          v-model="username"
+          label="Enter username"
+          type="text"
+          variant="outlined"></v-text-field>
+        <v-text-field
+          v-model="email"
+            label="Enter email"
+            type="email"
+            variant="outlined"></v-text-field>
+        <v-text-field
+          v-model="password"
+          label="Enter password"
+          type="password"
+          variant="outlined"></v-text-field>
+        <v-text-field
+          v-model="password_confirmation"
+          label="Confirm Password"
+          type="password"
+          variant="outlined"></v-text-field>
 
-      <div class="mb-4">
-        <label class="block mb-1">Confirm Password</label>
-        <input v-model="form.password_confirmation" type="password" class="w-full p-2 border rounded" required />
-      </div>
+        <!-- Error Message -->
+        <v-alert
+          v-if="error"
+          type="error"
+          dense
+          class="mb-3"
+        >
+          {{ error }}
+        </v-alert>
 
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Register</button>
+        <!-- Register Button -->
+        <v-btn
+          color="blue"
+          density="comfortable"
+          rounded="sm"
+          elevation="12"
+          type="submit">
+          Register</v-btn>
+        </v-form>
+ </v-sheet>
+    <!-- <RouterView/> -->
+  </v-main>
+</v-app>
 
-      <p class="text-red-600 mt-2" v-if="error">{{ error }}</p>
-    </form>
-  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
-const form = ref({
-  name: '',
-  email: '',
-  password: '',
-  password_confirmation: ''
-})
+const username= ref('')
+const email = ref('')
+const password = ref('')
+const password_confirmation = ref('')
 
+const router = useRouter()
 const error = ref(null)
 
 const register = async () => {
@@ -51,10 +95,15 @@ const register = async () => {
     await axios.get('/sanctum/csrf-cookie')
 
     // Then send registration request
-    const res = await axios.post('/api/register', form.value)
+    const res = await axios.post('/api/register', {
+    name: username.value,
+    email: email.value,
+    password: password.value,
+    password_confirmation: password_confirmation.value
+    })
 
     console.log('Registration successful:', res.data)
-    // You can redirect or set user state here
+     router.push({ path: 'Login' })
   } catch (err) {
     console.error(err)
     if (err.response?.data?.message) {

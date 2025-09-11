@@ -1,45 +1,78 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Sales Report</h1>
+  <div>
+    <v-app>
+      <v-app-bar app color="blue" dense dark>
+        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+        <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items v-show="!isLoggedIn">
+          <v-btn text @click="logout">Logout</v-btn>
+        </v-toolbar-items>
+        <CartIcon v-show="!isLoggedIn" />
+      </v-app-bar>
 
-    <!-- Loading State -->
-    <div v-if="loading" class="text-gray-600">Loading sales...</div>
+      <v-navigation-drawer app v-model="drawer" temporary>
+        <v-list>
+          <v-list-item link :to="{ path: '/login' }">
+            <v-list-item-title>Login</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
 
-    <!-- Error State -->
-    <div v-if="error" class="text-red-500">{{ error }}</div>
+      <v-main>
+        <v-container class="mt-6">
+          <v-card elevation="6" class="pa-4">
+            <v-card-title class="text-h5 font-weight-bold">Sales Report</v-card-title>
+            <v-card-text>
 
-    <!-- Sales Table -->
-    <div v-if="sales.length > 0" class="overflow-x-auto">
-      <table class="min-w-full bg-white border border-gray-200">
-        <thead>
-          <tr class="bg-gray-100 text-left">
-            <th class="py-2 px-4 border">#</th>
-            <th class="py-2 px-4 border">Cashier</th>
-            <th class="py-2 px-4 border">Payment Method</th>
-            <th class="py-2 px-4 border">Total Amount</th>
-            <th class="py-2 px-4 border">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(sale, index) in sales" :key="sale.id">
-            <td class="py-2 px-4 border">{{ index + 1 }}</td>
-            <td class="py-2 px-4 border">{{ sale.cashier?.name || 'N/A' }}</td>
-            <td class="py-2 px-4 border">{{ sale.payment_method }}</td>
-            <td class="py-2 px-4 border">Ksh {{ Number(sale.total_amount).toFixed(2) }}</td>
-            <td class="py-2 px-4 border">{{ new Date(sale.created_at).toLocaleString() }}</td>
-          </tr>
-        </tbody>
-      </table>
+              <!-- Loading State -->
+              <v-alert v-if="loading" type="info" border="start" elevation="2" class="mb-4">
+                Loading sales...
+              </v-alert>
 
-      <!-- Totals -->
-      <div class="mt-4 text-right font-bold">
-        Total Revenue: Ksh {{ totalRevenue.toFixed(2) }} <br>
-        Total Sales: {{ totalSales }}
-      </div>
-    </div>
+              <!-- Error State -->
+              <v-alert v-if="error" type="error" border="start" elevation="2" class="mb-4">
+                {{ error }}
+              </v-alert>
 
-    <!-- No Sales -->
-    <div v-else-if="!loading" class="text-gray-600">No sales recorded yet.</div>
+              <!-- Sales Table -->
+              <v-data-table
+                v-if="sales.length > 0"
+                :headers="headers"
+                :items="sales"
+                class="elevation-3"
+                dense
+              >
+              <template v-slot:[`item.total_amount`]="{ item }">
+               Ksh {{ Number(item.total_amount).toFixed(2) }}
+              </template>
+
+              <template v-slot:[`item.created_at`]="{ item }">
+                {{ new Date(item.created_at).toLocaleString() }}
+              </template>
+
+              <template v-slot:[`item.cashier`]="{ item }">
+                {{ item.cashier?.name || 'N/A' }}
+              </template>
+
+              </v-data-table>
+
+              <!-- Totals -->
+              <div v-if="sales.length > 0" class="mt-4 text-right font-weight-bold">
+                Total Revenue: Ksh {{ totalRevenue.toFixed(2) }} <br />
+                Total Sales: {{ totalSales }}
+              </div>
+
+              <!-- No Sales -->
+              <v-alert v-else-if="!loading" type="info" border="start" elevation="2" class="mt-4">
+                No sales recorded yet.
+              </v-alert>
+
+            </v-card-text>
+          </v-card>
+        </v-container>
+      </v-main>
+    </v-app>
   </div>
 </template>
 
@@ -50,11 +83,19 @@ export default {
   name: "AdminSalesReport",
   data() {
     return {
+      drawer: false,
       sales: [],
       totalRevenue: 0,
       totalSales: 0,
       loading: false,
       error: null,
+      headers: [
+        { title: '#', key: 'index', value: 'index' },
+        { title: 'Cashier', key: 'cashier' },
+        { title: 'Payment Method', key: 'payment_method' },
+        { title: 'Total Amount', key: 'total_amount' },
+        { title: 'Date', key: 'created_at' },
+      ],
     };
   },
   async created() {
@@ -65,10 +106,13 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const res = await axios.get('/api/sales'); // or full http://127.0.0.1:8000/api/sales if needed
+        const res = await axios.get('/api/sales');
         console.log("Sales response:", res.data);
 
-        this.sales = res.data.sales;
+        this.sales = res.data.sales.map((sale, index) => ({
+          ...sale,
+          index: index + 1,
+        }));
         this.totalRevenue = res.data.total_revenue;
         this.totalSales = res.data.total_sales;
       } catch (err) {
@@ -76,6 +120,16 @@ export default {
         console.error(err);
       } finally {
         this.loading = false;
+      }
+    },
+    async logout() {
+      try {
+        await axios.post('/api/logout');
+        localStorage.removeItem('token');
+        delete axios.defaults.headers.common['Authorization'];
+        this.$router.push('/login');
+      } catch (error) {
+        console.error('Logout failed:', error);
       }
     },
   },

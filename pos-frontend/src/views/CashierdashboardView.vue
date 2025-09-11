@@ -1,7 +1,6 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold">Cashier Dashboard</h1>
-
+    <h1 class="text-2xl font-bold">Cashier POS</h1>
 
     <!-- Products Table -->
     <h2 class="text-xl font-semibold mb-2">Available Products</h2>
@@ -23,7 +22,7 @@
             <button
               @click="addToCart(product)"
               :disabled="product.quantity === 0"
-              class="bg-blue-500 text-white px-3 py-1 disabled:bg-gray-400"
+              class="bg-blue-500 text-black px-3 py-1 disabled:bg-gray-400"
             >
               Add to Cart
             </button>
@@ -60,41 +59,59 @@
           </td>
           <td class="border p-2">Ksh {{ item.price * item.qty }}</td>
           <td class="border p-2">
-            <button @click="removeFromCart(item.id)" class="bg-red-500 text-white px-2 py-1">Remove</button>
+            <button @click="removeFromCart(item.id)" class="bg-red-500 text-black px-2 py-1">Remove</button>
           </td>
         </tr>
       </tbody>
     </table>
 
+    <!-- Payment Method -->
+    <div class="mb-4">
+      <label class="block mb-1 font-semibold">Payment Method</label>
+      <select v-model="paymentMethod" class="border p-2 w-full">
+        <option value="cash">Cash</option>
+        <option value="mpesa">M-Pesa</option>
+        <option value="card">Card</option>
+      </select>
+    </div>
+
+    <!-- MPESA Code -->
+    <div v-if="paymentMethod === 'mpesa'" class="mb-4">
+      <label class="block mb-1">M-Pesa Transaction Code</label>
+      <input v-model="mpesaCode" class="border p-2 w-full" />
+    </div>
+
     <!-- Total & Process Sale -->
     <div class="flex justify-between items-center">
       <h3 class="text-lg font-bold">Total: Ksh {{ totalPrice }}</h3>
       <button
-        @click="processSale"
+        @click="completeSale"
         :disabled="cart.length === 0"
-        class="bg-green-500 text-white px-4 py-2 disabled:bg-gray-400"
+        class="bg-green-500 text-black px-4 py-2 disabled:bg-gray-400"
       >
-        Process Sale
+        Complete Sale
       </button>
     </div>
-  
 
-    <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-white rounded">
+    <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-black rounded">
       Logout
     </button>
   </div>
 </template>
 
 <script setup>
-import axios from 'axios'
-import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 const router = useRouter()
 const products = ref([])
 const cart = ref([])
 
-// Fetch products from backend
+const paymentMethod = ref('cash')
+const mpesaCode = ref('')
+
+// Fetch products
 const getProducts = async () => {
   try {
     const res = await axios.get('/api/products')
@@ -104,13 +121,11 @@ const getProducts = async () => {
   }
 }
 
-// Add product to cart
+// Cart logic
 const addToCart = (product) => {
   const existing = cart.value.find((item) => item.id === product.id)
   if (existing) {
-    if (existing.qty < product.quantity) {
-      existing.qty++
-    }
+    if (existing.qty < product.quantity) existing.qty++
   } else {
     cart.value.push({
       id: product.id,
@@ -122,34 +137,43 @@ const addToCart = (product) => {
   }
 }
 
-// Remove from cart
 const removeFromCart = (id) => {
   cart.value = cart.value.filter((item) => item.id !== id)
 }
 
-// Update cart qty
 const updateCart = (item) => {
-  if (item.qty > item.stock) {
-    item.qty = item.stock
-  } else if (item.qty < 1) {
-    item.qty = 1
-  }
+  if (item.qty > item.stock) item.qty = item.stock
+  if (item.qty < 1) item.qty = 1
 }
 
-// Total price
-const totalPrice = computed(() => {
-  return cart.value.reduce((sum, item) => sum + item.price * item.qty, 0)
-})
+const totalPrice = computed(() =>
+  cart.value.reduce((sum, item) => sum + item.price * item.qty, 0)
+)
 
-// Process sale (placeholder for now)
-const processSale = async () => {
+// Complete Sale (From CashierSale.vue)
+const completeSale = async () => {
+  if (cart.value.length === 0) return alert('Cart is empty')
+
   try {
-    // We will replace this with Daraja API call later
-    alert(`Sale processed! Total: Ksh ${totalPrice.value}`)
+    await axios.post('/api/sales', {
+      items: cart.value.map((item) => ({
+        product_id: item.id,
+        name: item.name,
+        quantity: item.qty,
+        price: item.price
+      })),
+      payment_method: paymentMethod.value,
+      mpesa_code: mpesaCode.value
+    })
+
+    alert('Sale completed successfully!')
     cart.value = []
-    getProducts() // refresh stock
-  } catch (err) {
-    console.error('Error processing sale:', err)
+    paymentMethod.value = 'cash'
+    mpesaCode.value = ''
+    getProducts()
+  } catch (error) {
+    console.error(error)
+    alert('Failed to complete sale')
   }
 }
 
@@ -160,11 +184,8 @@ onMounted(() => {
 const logout = async () => {
   try {
     await axios.post('/api/logout')
-
-    // Clear token from storage and axios
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-
+    localStorage.removeItem('token')
+    delete axios.defaults.headers.common['Authorization']
     router.push('/login')
   } catch (error) {
     console.error('Logout failed:', error)
