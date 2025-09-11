@@ -1,66 +1,147 @@
 <template>
   <div class="p-4">
-    <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+  <v-app>
+    <v-app-bar app color="blue" dense>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-items class="hidden-sm-and-down" v-show="!isLoggedIn">
+          <v-btn text :to="{ path: '/adminsalesreport' }">Sales Report</v-btn>
+          <v-btn text color="white" @click="logout">Logout </v-btn>
+      </v-toolbar-items>
+      <CartIcon v-show="!isLoggedIn"/>
+    </v-app-bar>
 
-    <!-- Add Product Form -->
-    <form @submit.prevent="addProduct" class="mb-6">
-      <input v-model="newProduct.name" type="text" placeholder="Product Name" class="border p-2 mr-2" />
-      <input v-model="newProduct.price" type="number" placeholder="Price" step="0.01" class="border p-2 mr-2" />
-      <input v-model="newProduct.quantity" type="number" placeholder="Quantity" class="border p-2 mr-2" />
-      <button type="submit" class="bg-green-500 text-black px-4 py-2">Add</button>
-    </form>
+   <v-navigation-drawer app v-model="drawer" temporary>
+    <v-list>
+      <v-list-item link :to="{ path: '/login' }"><v-list-item-title>Login</v-list-item-title></v-list-item>
+      <!-- <v-list-item link :to="{ path:'/signup' }"><v-list-item-title>Signup</v-list-item-title></v-list-item> -->
+    </v-list>
+   </v-navigation-drawer>
 
-    <!-- Product List -->
-    <table class="border-collapse border w-full">
-      <thead>
-        <tr>
-          <th class="border p-2">ID</th>
-          <th class="border p-2">Name</th>
-          <th class="border p-2">Price</th>
-          <th class="border p-2">Quantity</th>
-          <th class="border p-2">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td class="border p-2">{{ product.id }}</td>
-          <td class="border p-2" v-if="editId !== product.id">{{ product.name }}</td>
-          <td class="border p-2" v-else>
-            <input v-model="editProduct.name" class="border p-1" />
-          </td>
+  <v-main>
+  <v-container class="mt-5">
+    <v-sheet class="mx-auto pa-6" max-width="900" elevation="12">
+      <h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
-          <td class="border p-2" v-if="editId !== product.id">{{ product.price }}</td>
-          <td class="border p-2" v-else>
-            <input v-model="editProduct.price" type="number" class="border p-1" />
-          </td>
+      <!-- Add Product Form -->
+      <v-form @submit.prevent="addProduct" class="mb-6">
+        <v-row dense>
+          <v-col cols="12" sm="4">
+            <v-text-field
+              v-model="newProduct.name"
+              label="Product Name"
+              variant="outlined"
+              dense
+            />
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-text-field
+              v-model="newProduct.price"
+              label="Price"
+              type="number"
+              variant="outlined"
+              dense
+            />
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-text-field
+              v-model="newProduct.quantity"
+              label="Quantity"
+              type="number"
+              variant="outlined"
+              dense
+            />
+          </v-col>
+        </v-row>
+        <v-btn type="submit" color="green" elevation="8" class="mt-2">
+          Add Product
+        </v-btn>
+      </v-form>
 
-          <td class="border p-2" v-if="editId !== product.id">{{ product.quantity }}</td>
-          <td class="border p-2" v-else>
-            <input v-model="editProduct.quantity" type="number" class="border p-1" />
-          </td>
-
-          <td class="border p-2">
-            <template v-if="editId === product.id">
-              <button @click="updateProduct(product.id)" class="bg-blue-500 text-black px-2 py-1 mr-2">Save</button>
-              <button @click="cancelEdit" class="bg-gray-500 text-black px-2 py-1">Cancel</button>
-            </template>
-            <template v-else>
-              <button @click="startEdit(product)" class="bg-yellow-500 text-black px-2 py-1 mr-2">Edit</button>
-              <button @click="deleteProduct(product.id)" class="bg-red-500 text-black px-2 py-1">Delete</button>
-            </template>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-<router-link
-  to="/adminsalesreport"
-  class="mt-4 px-4 py-2 bg-red-600 text-black rounded"
+      <!-- Product Table -->
+     <v-data-table
+  :headers="headers"
+  :items="products"
+  class="elevation-3"
+  item-value="id"
 >
-  Sales Report
-</router-link>
-    <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-black rounded">
-      Logout
-    </button>
+  <template v-slot:[`item.name`]="{ item }">
+    <v-text-field
+      v-if="editId === item.id"
+      v-model="editProduct.name"
+      dense
+      variant="outlined"
+    />
+    <span v-else>{{ item.name }}</span>
+  </template>
+
+  <template v-slot:[`item.price`]="{ item }">
+    <v-text-field
+      v-if="editId === item.id"
+      v-model="editProduct.price"
+      type="number"
+      dense
+      variant="outlined"
+    />
+    <span v-else>{{ item.price }}</span>
+  </template>
+
+  <template v-slot:[`item.quantity`]="{ item }">
+    <v-text-field
+      v-if="editId === item.id"
+      v-model="editProduct.quantity"
+      type="number"
+      dense
+      variant="outlined"
+    />
+    <span v-else>{{ item.quantity }}</span>
+  </template>
+
+  <template v-slot:[`item.actions`]="{ item }">
+  <template v-if="editId === item.id">
+    <v-btn
+      color="green"
+      size="small"
+      class="mr-2"
+      @click="updateProduct(item.id)"
+    >
+      Save
+    </v-btn>
+    <v-btn
+      color="grey"
+      size="small"
+      @click="cancelEdit"
+    >
+      Cancel
+    </v-btn>
+  </template>
+  <template v-else>
+    <v-btn
+      color="blue"
+      size="small"
+      class="mr-2"
+      @click="startEdit(item)"
+    >
+      Edit
+    </v-btn>
+    <v-btn
+      color="red"
+      size="small"
+      @click="deleteProduct(item.id)"
+    >
+      Delete
+    </v-btn>
+  </template>
+</template>
+
+
+</v-data-table>
+    </v-sheet>
+  </v-container>
+  </v-main>
+
+</v-app>
   </div>
 </template>
 
@@ -76,7 +157,13 @@ const newProduct = ref({
   price: '',
   quantity: ''
 })
-
+const headers = [
+  { title: 'ID', key: 'id' },
+  { title: 'Name', key: 'name' },
+  { title: 'Price', key: 'price' },
+  { title: 'Quantity', key: 'quantity' },
+  { title: 'Actions', key: 'actions', sortable: false },
+]
 const editId = ref(null)
 const editProduct = ref({ name: '', price: '', quantity: '' })
 
