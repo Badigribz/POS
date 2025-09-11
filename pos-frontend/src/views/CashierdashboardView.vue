@@ -1,102 +1,118 @@
 <template>
-  <div class="p-4">
-    <h1 class="text-2xl font-bold">Cashier POS</h1>
+  <v-app>
+    <!-- App Bar -->
+    <v-app-bar app color="blue" dense dark>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-items v-show="!isLoggedIn">
+        <v-btn text @click="logout">Logout</v-btn>
+      </v-toolbar-items>
+      <CartIcon v-show="!isLoggedIn" />
+    </v-app-bar>
 
-    <!-- Products Table -->
-    <h2 class="text-xl font-semibold mb-2">Available Products</h2>
-    <table class="border-collapse border w-full mb-6">
-      <thead>
-        <tr>
-          <th class="border p-2">Name</th>
-          <th class="border p-2">Price</th>
-          <th class="border p-2">Stock</th>
-          <th class="border p-2">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td class="border p-2">{{ product.name }}</td>
-          <td class="border p-2">Ksh {{ product.price }}</td>
-          <td class="border p-2">{{ product.quantity }}</td>
-          <td class="border p-2">
-            <button
-              @click="addToCart(product)"
-              :disabled="product.quantity === 0"
-              class="bg-blue-500 text-black px-3 py-1 disabled:bg-gray-400"
+    <!-- Navigation Drawer -->
+    <v-navigation-drawer app v-model="drawer" temporary>
+      <v-list>
+        <v-list-item link :to="{ path: '/login' }">
+          <v-list-item-title>Login</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+
+    <!-- Main Content -->
+    <v-main>
+      <v-container>
+        <v-card elevation="6" class="pa-4 mt-4">
+          <v-card-title class="text-h5 font-weight-bold">Cashier POS</v-card-title>
+
+          <v-divider class="mb-4"></v-divider>
+
+          <!-- Products Table -->
+          <v-card-subtitle class="mb-2">Available Products</v-card-subtitle>
+          <v-data-table
+            :headers="productHeaders"
+            :items="products"
+            class="mb-6"
+            dense
+            :items-per-page="5"
+          >
+            <template v-slot:[`item.action`]="{ item }">
+              <v-btn
+                color="blue"
+                density="comfortable"
+                :disabled="item.quantity === 0"
+                @click="addToCart(item)"
+              >
+                Add to Cart
+              </v-btn>
+            </template>
+          </v-data-table>
+
+          <!-- Cart Section -->
+          <v-card-subtitle class="mb-2">Cart</v-card-subtitle>
+          <v-data-table
+            :headers="cartHeaders"
+            :items="cart"
+            class="mb-4"
+            dense
+          >
+            <template v-slot:[`item.qty`]="{ item }">
+              <v-text-field
+                v-model.number="item.qty"
+                type="number"
+                min="1"
+                :max="item.stock"
+                density="compact"
+                style="width: 70px"
+                @change="updateCart(item)"
+              />
+            </template>
+            <template v-slot:[`item.total`]="{ item }">
+              Ksh {{ (item.price * item.qty).toFixed(2) }}
+            </template>
+            <template v-slot:[`item.action`]="{ item }">
+              <v-btn color="red" density="comfortable" @click="removeFromCart(item.id)">
+                Remove
+              </v-btn>
+            </template>
+          </v-data-table>
+
+          <!-- Payment Method -->
+          <v-select
+            v-model="paymentMethod"
+            :items="['cash', 'mpesa', 'card']"
+            label="Payment Method"
+            outlined
+            dense
+            class="mb-4"
+          />
+
+          <!-- MPESA Code -->
+          <v-text-field
+            v-if="paymentMethod === 'mpesa'"
+            v-model="mpesaCode"
+            label="M-Pesa Transaction Code"
+            outlined
+            dense
+            class="mb-4"
+          />
+
+          <!-- Total & Complete Sale -->
+          <div class="d-flex justify-space-between align-center">
+            <h3 class="text-lg font-weight-bold">Total: Ksh {{ totalPrice.toFixed(2) }}</h3>
+            <v-btn
+              color="green"
+              :disabled="cart.length === 0"
+              @click="completeSale"
             >
-              Add to Cart
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Cart Section -->
-    <h2 class="text-xl font-semibold mb-2">Cart</h2>
-    <table class="border-collapse border w-full mb-4">
-      <thead>
-        <tr>
-          <th class="border p-2">Name</th>
-          <th class="border p-2">Price</th>
-          <th class="border p-2">Qty</th>
-          <th class="border p-2">Total</th>
-          <th class="border p-2">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in cart" :key="item.id">
-          <td class="border p-2">{{ item.name }}</td>
-          <td class="border p-2">Ksh {{ item.price }}</td>
-          <td class="border p-2">
-            <input
-              type="number"
-              v-model.number="item.qty"
-              min="1"
-              :max="item.stock"
-              class="border p-1 w-16"
-              @change="updateCart(item)"
-            />
-          </td>
-          <td class="border p-2">Ksh {{ item.price * item.qty }}</td>
-          <td class="border p-2">
-            <button @click="removeFromCart(item.id)" class="bg-red-500 text-black px-2 py-1">Remove</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- Payment Method -->
-    <div class="mb-4">
-      <label class="block mb-1 font-semibold">Payment Method</label>
-      <select v-model="paymentMethod" class="border p-2 w-full">
-        <option value="cash">Cash</option>
-        <option value="mpesa">M-Pesa</option>
-        <option value="card">Card</option>
-      </select>
-    </div>
-
-    <!-- MPESA Code -->
-    <div v-if="paymentMethod === 'mpesa'" class="mb-4">
-      <label class="block mb-1">M-Pesa Transaction Code</label>
-      <input v-model="mpesaCode" class="border p-2 w-full" />
-    </div>
-
-    <!-- Total & Process Sale -->
-    <div class="flex justify-between items-center">
-      <h3 class="text-lg font-bold">Total: Ksh {{ totalPrice }}</h3>
-      <button
-        @click="completeSale"
-        :disabled="cart.length === 0"
-        class="bg-green-500 text-black px-4 py-2 disabled:bg-gray-400"
-      >
-        Complete Sale
-      </button>
-    </div>
-
-    <button @click="logout" class="mt-4 px-4 py-2 bg-red-600 text-black rounded">
-      Logout
-    </button>
-  </div>
+              Complete Sale
+            </v-btn>
+          </div>
+        </v-card>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
@@ -110,6 +126,23 @@ const cart = ref([])
 
 const paymentMethod = ref('cash')
 const mpesaCode = ref('')
+const drawer = ref(false)
+const isLoggedIn = false // Adjust this as needed
+
+const productHeaders = [
+  { title: 'Name', key: 'name' },
+  { title: 'Price', key: 'price' },
+  { title: 'Stock', key: 'quantity' },
+  { title: 'Action', key: 'action', sortable: false }
+]
+
+const cartHeaders = [
+  { title: 'Name', key: 'name' },
+  { title: 'Price', key: 'price' },
+  { title: 'Qty', key: 'qty' },
+  { title: 'Total', key: 'total' },
+  { title: 'Action', key: 'action', sortable: false }
+]
 
 // Fetch products
 const getProducts = async () => {
@@ -150,7 +183,6 @@ const totalPrice = computed(() =>
   cart.value.reduce((sum, item) => sum + item.price * item.qty, 0)
 )
 
-// Complete Sale (From CashierSale.vue)
 const completeSale = async () => {
   if (cart.value.length === 0) return alert('Cart is empty')
 
