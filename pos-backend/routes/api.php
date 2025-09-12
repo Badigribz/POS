@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\MpesaController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -23,6 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('/sales', [SaleController::class, 'report']);
 });
  Route::get('/sales', [SaleController::class, 'report']);
+ Route::post('/mpesa/stkpush', [MpesaController::class, 'stkPush']);
+ Route::post('/mpesa/callback', [MpesaController::class, 'callback']);
 // Route::middleware(['auth:sanctum'])->group(function () {
 //     Route::get('/sales/report', [SaleController::class, 'report']);
 // });
