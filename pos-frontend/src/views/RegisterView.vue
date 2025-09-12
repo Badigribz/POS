@@ -78,6 +78,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const username= ref('')
 const email = ref('')
@@ -86,6 +87,7 @@ const password_confirmation = ref('')
 
 const router = useRouter()
 const error = ref(null)
+const toast = useToast()
 
 const register = async () => {
   error.value = null
@@ -103,13 +105,20 @@ const register = async () => {
     })
 
     console.log('Registration successful:', res.data)
+    toast.success('Registration successful! Please log in.')
      router.push({ path: 'Login' })
   } catch (err) {
     console.error(err)
+
     if (err.response?.data?.message) {
-      error.value = err.response.data.message
+      // Validation errors from Laravel
+      const messages = Object.values(err.response.data.errors).flat().join(' ')
+      toast.error(messages)
+    // eslint-disable-next-line no-dupe-else-if
+    } else if (err.response?.data?.message) {
+      toast.error(err.response.data.message)
     } else {
-      error.value = 'Registration failed'
+      toast.error('Registration failed. Please try again.')
     }
   }
 }
