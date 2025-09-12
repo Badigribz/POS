@@ -5,6 +5,8 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import Toast, { POSITION } from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
 
 //Vuetify
 import 'vuetify/styles'
@@ -29,5 +31,9 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)
+app.use(Toast, {
+  position: POSITION.TOP_CENTER,
+  timeout: 3000,
+})
 
 app.mount('#app')
