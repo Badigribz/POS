@@ -149,7 +149,9 @@
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const router = useRouter()
 const products = ref([])
 const newProduct = ref({
@@ -183,6 +185,7 @@ const addProduct = async () => {
     await axios.post('/api/products', newProduct.value)
     newProduct.value = { name: '', price: '', quantity: '' }
     getProducts() // Refresh list
+    toast.success('Product added')
   } catch (err) {
     console.error('Error adding product:', err)
   }

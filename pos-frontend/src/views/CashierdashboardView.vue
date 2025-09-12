@@ -90,13 +90,15 @@
 
           <!-- MPESA Code -->
           <v-text-field
+
             v-if="paymentMethod === 'mpesa'"
-            v-model="mpesaCode"
-            label="M-Pesa Transaction Code"
+            v-model="mpesaPhone"
+            label="Customer M-Pesa Phone"
             outlined
             dense
             class="mb-4"
           />
+
 
           <!-- Total & Complete Sale -->
           <div class="d-flex justify-space-between align-center">
@@ -119,13 +121,15 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const products = ref([])
 const cart = ref([])
+const toast = useToast()
 
 const paymentMethod = ref('cash')
-const mpesaCode = ref('')
+const mpesaPhone = ref('')
 const drawer = ref(false)
 const isLoggedIn = false // Adjust this as needed
 
@@ -167,6 +171,7 @@ const addToCart = (product) => {
       qty: 1,
       stock: product.quantity
     })
+    toast.success('Product added to cart')
   }
 }
 
@@ -187,6 +192,16 @@ const completeSale = async () => {
   if (cart.value.length === 0) return alert('Cart is empty')
 
   try {
+    if (paymentMethod.value === 'mpesa') {
+      const stkRes = await axios.post('/api/mpesa/stkpush', {
+        phone: mpesaPhone.value,
+        amount: totalPrice.value,
+      })
+
+      console.log(stkRes.data)
+      toast.success('STK push sent to customer. Waiting for confirmation...')
+    }
+
     await axios.post('/api/sales', {
       items: cart.value.map((item) => ({
         product_id: item.id,
@@ -194,14 +209,12 @@ const completeSale = async () => {
         quantity: item.qty,
         price: item.price
       })),
-      payment_method: paymentMethod.value,
-      mpesa_code: mpesaCode.value
+      payment_method: paymentMethod.value
     })
-
-    alert('Sale completed successfully!')
+    toast.success('Sale completed')
     cart.value = []
     paymentMethod.value = 'cash'
-    mpesaCode.value = ''
+    mpesaPhone.value = ''
     getProducts()
   } catch (error) {
     console.error(error)
