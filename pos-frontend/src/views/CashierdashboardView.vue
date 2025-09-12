@@ -99,6 +99,16 @@
             class="mb-4"
           />
 
+          <!-- New Button for MPESA -->
+          <v-btn
+            v-if="paymentMethod === 'mpesa'"
+            color="blue"
+            class="mb-4"
+            :disabled="!mpesaPhone"
+            @click="sendStkPush"
+          >
+            Send STK Push
+          </v-btn>
 
           <!-- Total & Complete Sale -->
           <div class="d-flex justify-space-between align-center">
@@ -188,37 +198,48 @@ const totalPrice = computed(() =>
   cart.value.reduce((sum, item) => sum + item.price * item.qty, 0)
 )
 
-const completeSale = async () => {
-  if (cart.value.length === 0) return alert('Cart is empty')
+const sendStkPush = async () => {
+  if (!mpesaPhone.value) {
+    return toast.error('Please enter a phone number')
+  }
 
   try {
-    if (paymentMethod.value === 'mpesa') {
-      const stkRes = await axios.post('/api/mpesa/stkpush', {
-        phone: mpesaPhone.value,
-        amount: totalPrice.value,
-      })
+    const res = await axios.post('/api/mpesa/stkpush', {
+      phone: mpesaPhone.value,
+      amount: totalPrice.value,
+    })
+    console.log(res.data)
+    toast.success('STK push sent to customer!')
+  } catch (error) {
+    console.error(error)
+    toast.error('Failed to send STK push')
+  }
+}
 
-      console.log(stkRes.data)
-      toast.success('STK push sent to customer. Waiting for confirmation...')
-    }
+const completeSale = async () => {
+  if (cart.value.length === 0) return toast.error('Cart is empty')
 
+  try {
+    // Just complete sale (no stk here)
     await axios.post('/api/sales', {
       items: cart.value.map((item) => ({
         product_id: item.id,
         name: item.name,
         quantity: item.qty,
-        price: item.price
+        price: item.price,
       })),
       payment_method: paymentMethod.value
     })
+
     toast.success('Sale completed')
     cart.value = []
     paymentMethod.value = 'cash'
     mpesaPhone.value = ''
     getProducts()
+
   } catch (error) {
     console.error(error)
-    alert('Failed to complete sale')
+    toast.error('Failed to complete sale')
   }
 }
 
