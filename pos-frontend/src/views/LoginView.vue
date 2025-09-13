@@ -1,27 +1,13 @@
 <template>
-    <v-app>
+ <v-app>
     <v-app-bar app color="blue" dense>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
-      <!-- <v-spacer></v-spacer> -->
       <v-toolbar-items class="hidden-sm-and-down" v-show="!isLoggedIn">
           <v-btn text :to="{ path: '/login'}">Login</v-btn>
           <v-btn text :to="{ path: '/'}">Signup</v-btn>
       </v-toolbar-items>
-      <CartIcon v-show="!isLoggedIn"/>
-      {{ isLoggedIn }}
-      <v-btn text @click="logout" v-show="isLoggedIn">Logout</v-btn>
     </v-app-bar>
-
-   <v-navigation-drawer app v-model="drawer" temporary>
-    <v-list>
-      <v-list-item link :to="{ path: '/login' }"><v-list-item-title>Login</v-list-item-title></v-list-item>
-      <!-- <v-list-item link :to="{ path:'/signup' }"><v-list-item-title>Signup</v-list-item-title></v-list-item> -->
-    </v-list>
-   </v-navigation-drawer>
-
-
-  <v-main>
+   <v-main>
     <v-sheet
        class="mx-auto pa-12 mt-5"
        max-width="500"
@@ -46,7 +32,6 @@
         type="submit">Login</v-btn>
         </v-form>
     </v-sheet>
-    <!-- <RouterView/> -->
   </v-main>
 </v-app>
 

@@ -2,23 +2,9 @@
   <div>
     <v-app>
       <v-app-bar app color="blue" dense dark>
-        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-toolbar-items v-show="!isLoggedIn">
           <v-btn text @click="logout">Logout</v-btn>
-        </v-toolbar-items>
-        <CartIcon v-show="!isLoggedIn" />
       </v-app-bar>
-
-      <v-navigation-drawer app v-model="drawer" temporary>
-        <v-list>
-          <v-list-item link :to="{ path: '/login' }">
-            <v-list-item-title>Login</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-navigation-drawer>
-
       <v-main>
         <v-container class="mt-6">
           <v-card elevation="6" class="pa-4">

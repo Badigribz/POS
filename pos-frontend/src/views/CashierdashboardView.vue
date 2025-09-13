@@ -2,23 +2,9 @@
   <v-app>
     <!-- App Bar -->
     <v-app-bar app color="blue" dense dark>
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-toolbar-items v-show="!isLoggedIn">
         <v-btn text @click="logout">Logout</v-btn>
-      </v-toolbar-items>
-      <CartIcon v-show="!isLoggedIn" />
     </v-app-bar>
-
-    <!-- Navigation Drawer -->
-    <v-navigation-drawer app v-model="drawer" temporary>
-      <v-list>
-        <v-list-item link :to="{ path: '/login' }">
-          <v-list-item-title>Login</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
 
     <!-- Main Content -->
     <v-main>
@@ -140,8 +126,7 @@ const toast = useToast()
 
 const paymentMethod = ref('cash')
 const mpesaPhone = ref('')
-const drawer = ref(false)
-const isLoggedIn = false // Adjust this as needed
+
 
 const productHeaders = [
   { title: 'Name', key: 'name' },
