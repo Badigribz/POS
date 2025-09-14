@@ -87,5 +87,10 @@ class SaleController extends Controller
             'sales' => $sales
         ]);
    }
+    public function showItems($id)
+    {
+        $sale = Sale::with(['items.product', 'cashier'])->findOrFail($id);
+        return response()->json($sale);
+    }
 
 }

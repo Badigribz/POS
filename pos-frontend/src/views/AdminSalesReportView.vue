@@ -3,7 +3,7 @@
     <v-app>
       <v-app-bar app color="blue" dense dark>
         <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
-          <v-btn text @click="logout">Logout</v-btn>
+        <v-btn text @click="$router.back()">Back</v-btn>
       </v-app-bar>
       <v-main>
         <v-container class="mt-6">
@@ -34,6 +34,7 @@
               >
               <template v-slot:[`item.total_amount`]="{ item }">
                Ksh {{ Number(item.total_amount).toFixed(2) }}
+                <v-btn text :to="{ path: `/itemssoldpage/${item.id}` }">Items sold</v-btn>
               </template>
 
               <template v-slot:[`item.created_at`]="{ item }">
@@ -100,6 +101,7 @@ export default {
 
         this.sales = res.data.sales.map((sale, index) => ({
           ...sale,
+          id: sale.id,
           index: index + 1,
         }));
         this.totalRevenue = res.data.total_revenue;

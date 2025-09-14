@@ -26,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
  Route::get('/sales', [SaleController::class, 'report']);
  Route::post('/mpesa/stkpush', [MpesaController::class, 'stkPush']);
  Route::post('/mpesa/callback', [MpesaController::class, 'callback']);
+ Route::get('/sales/{id}/items', [SaleController::class, 'showItems']);
+
 // Route::middleware(['auth:sanctum'])->group(function () {
 //     Route::get('/sales/report', [SaleController::class, 'report']);
 // });
