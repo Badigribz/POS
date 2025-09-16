@@ -15,19 +15,14 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('products', ProductController::class);
+Route::apiResource('products', ProductController::class);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products', [ProductController::class, 'index']); // For cashier to list products
     Route::post('/sales', [SaleController::class, 'store']); // To record sales
-    // Route::get('/sales', [SaleController::class, 'report']);
 });
  Route::get('/sales', [SaleController::class, 'report']);
  Route::post('/mpesa/stkpush', [MpesaController::class, 'stkPush']);
  Route::post('/mpesa/callback', [MpesaController::class, 'callback']);
  Route::get('/sales/{id}/items', [SaleController::class, 'showItems']);
-
-// Route::middleware(['auth:sanctum'])->group(function () {
-//     Route::get('/sales/report', [SaleController::class, 'report']);
-// });
