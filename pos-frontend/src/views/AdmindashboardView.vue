@@ -11,6 +11,10 @@
     <v-sheet class="mx-auto pa-6" max-width="900" elevation="12">
       <h1 class="text-2xl text-center font-bold mb-4">Admin Dashboard</h1>
 
+    <div v-if="user" class="text-center mb-4">
+      <p class="text-lg">Welcome, <strong>{{ user.name }}</strong></p>
+    </div>
+
       <!-- Add Product Form -->
       <v-form @submit.prevent="addProduct" class="mb-6">
         <v-row dense>
@@ -140,6 +144,8 @@ import { useToast } from 'vue-toastification'
 
 const toast = useToast()
 const router = useRouter()
+
+const user = ref(null)
 const products = ref([])
 const newProduct = ref({
   name: '',
@@ -155,6 +161,15 @@ const headers = [
 ]
 const editId = ref(null)
 const editProduct = ref({ name: '', price: '', quantity: '' })
+
+const getUser = async () => {
+  try {
+    const res = await axios.get('/api/user')
+    user.value = res.data
+  } catch (err) {
+    console.error('Error fetching user:', err)
+  }
+}
 
 // Fetch products
 const getProducts = async () => {
@@ -213,6 +228,7 @@ const updateProduct = async (id) => {
 
 onMounted(() => {
   getProducts()
+  getUser()
 })
 
 const logout = async () => {

@@ -12,6 +12,11 @@
         <v-card elevation="6" class="pa-4 mt-4">
           <v-card-title class="text-h5 text-center font-weight-bold">Cashier Dashboard</v-card-title>
 
+              <div v-if="user" class="text-center mb-4">
+                <p class="text-lg">Welcome, <strong>{{ user.name }}</strong></p>
+              </div>
+
+
           <v-divider class="mb-4"></v-divider>
 
           <!-- Products Table -->
@@ -126,6 +131,8 @@ const toast = useToast()
 
 const paymentMethod = ref('cash')
 const mpesaPhone = ref('')
+const user = ref(null)
+
 
 
 const productHeaders = [
@@ -142,6 +149,15 @@ const cartHeaders = [
   { title: 'Total', key: 'total' },
   { title: 'Action', key: 'action', sortable: false }
 ]
+
+const getUser = async () => {
+  try {
+    const res = await axios.get('/api/user')
+    user.value = res.data
+  } catch (err) {
+    console.error('Error fetching user:', err)
+  }
+}
 
 // Fetch products
 const getProducts = async () => {
@@ -230,6 +246,7 @@ const completeSale = async () => {
 
 onMounted(() => {
   getProducts()
+  getUser()
 })
 
 const logout = async () => {
