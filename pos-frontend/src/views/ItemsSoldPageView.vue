@@ -80,7 +80,7 @@ export default {
       try {
         const res = await axios.get(`/api/sales/${this.id}/items`);
         this.sale = res.data;
-      } catch (err) {
+      } catch {
         this.error = "Failed to load sale details.";
       } finally {
         this.loading = false;
