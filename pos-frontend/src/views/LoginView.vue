@@ -2,10 +2,8 @@
  <v-app>
     <v-app-bar app color="blue" dense>
       <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
-      <v-toolbar-items class="hidden-sm-and-down" v-show="!isLoggedIn">
           <v-btn text :to="{ path: '/login'}">Login</v-btn>
           <v-btn text :to="{ path: '/'}">Signup</v-btn>
-      </v-toolbar-items>
     </v-app-bar>
    <v-main>
     <v-sheet
