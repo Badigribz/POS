@@ -204,9 +204,15 @@ const sendStkPush = async () => {
     return toast.error('Please enter a phone number')
   }
 
+  let phone = mpesaPhone.value.trim()
+
+  if (phone.startsWith('07')) {
+    phone = '254' + phone.substring(1)
+  }
+
   try {
     const res = await axios.post('/api/mpesa/stkpush', {
-      phone: mpesaPhone.value,
+      phone: phone,
       amount: totalPrice.value,
     })
     console.log(res.data)
@@ -221,7 +227,6 @@ const completeSale = async () => {
   if (cart.value.length === 0) return toast.error('Cart is empty')
 
   try {
-    // Just complete sale (no stk here)
     await axios.post('/api/sales', {
       items: cart.value.map((item) => ({
         product_id: item.id,
