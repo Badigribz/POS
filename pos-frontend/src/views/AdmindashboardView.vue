@@ -2,6 +2,7 @@
   <div class="p-4">
   <v-app>
     <v-app-bar app color="blue" dense>
+       <v-btn text :to="{ path: '/profile' }">Profile</v-btn>
       <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
           <v-btn text :to="{ path: '/adminsalesreport' }">Sales Report</v-btn>
           <v-btn text color="white" @click="logout">Logout </v-btn>
