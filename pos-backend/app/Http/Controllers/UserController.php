@@ -7,21 +7,28 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-     public function update(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $request->user()->id,
-        ]);
+public function update(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:users,email,' . $request->user()->id,
+        'password' => 'nullable|min:6|confirmed', // confirmed checks password_confirmation
+    ]);
 
-        $user = $request->user();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->save();
-        
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => $user
-        ]);
+    $user = $request->user();
+    $user->name = $request->name;
+    $user->email = $request->email;
+
+    if ($request->filled('password')) {
+        $user->password = bcrypt($request->password);
     }
+
+    $user->save();
+
+    return response()->json([
+        'message' => 'Profile updated successfully',
+        'user' => $user
+    ]);
+}
+
 }

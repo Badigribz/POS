@@ -31,6 +31,24 @@
                 required
               />
 
+              <!-- Password -->
+              <v-text-field
+                v-model="form.password"
+                label="New Password"
+                type="password"
+                variant="outlined"
+                dense
+              />
+
+              <!-- Confirm Password -->
+              <v-text-field
+                v-model="form.password_confirmation"
+                label="Confirm Password"
+                type="password"
+                variant="outlined"
+                dense
+              />
+
               <v-btn type="submit" color="green" elevation="8" class="mt-4">
                 Save Changes
               </v-btn>
@@ -48,7 +66,7 @@ import { ref, onMounted } from "vue"
 import { useToast } from "vue-toastification"
 
 const toast = useToast()
-const form = ref({ name: "", email: "" })
+const form = ref({ name: "", email: "", password: "", password_confirmation: "" })
 const user = ref(null)
 
 // Fetch user profile
@@ -69,6 +87,9 @@ const updateProfile = async () => {
     const res = await axios.put("/api/user", form.value)
     toast.success("Profile updated successfully")
     user.value = res.data.user // update local state
+    // clear password fields after update
+    form.value.password = ""
+    form.value.password_confirmation = ""
   } catch (err) {
     console.error("Error updating profile:", err)
     toast.error("Failed to update profile")
