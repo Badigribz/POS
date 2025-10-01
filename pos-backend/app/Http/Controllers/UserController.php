@@ -11,12 +11,14 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $request->user()->id,
         ]);
 
-        $user = Auth::user();
+        $user = $request->user();
         $user->name = $request->name;
+        $user->email = $request->email;
         $user->save();
-
+        
         return response()->json([
             'message' => 'Profile updated successfully',
             'user' => $user

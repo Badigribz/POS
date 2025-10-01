@@ -1,19 +1,31 @@
 <template>
   <div class="p-4">
     <v-app>
-        <v-app-bar app color="blue" dense>
-          <v-toolbar-title>USER PROFILE</v-toolbar-title>
-              <v-btn text :to="{ path: '/' }">Dashboard</v-btn>
-        </v-app-bar>
+      <v-app-bar app color="blue" dense>
+        <v-toolbar-title>USER PROFILE</v-toolbar-title>
+        <v-btn text :to="{ path: '/' }">Dashboard</v-btn>
+      </v-app-bar>
+
       <v-main>
         <v-container class="mt-5">
           <v-sheet class="mx-auto pa-6" max-width="600" elevation="12">
             <h1 class="text-2xl text-center font-bold mb-4">Update Profile</h1>
 
             <v-form @submit.prevent="updateProfile">
+              <!-- Name -->
               <v-text-field
                 v-model="form.name"
                 label="Name"
+                variant="outlined"
+                dense
+                required
+              />
+
+              <!-- Email -->
+              <v-text-field
+                v-model="form.email"
+                label="Email"
+                type="email"
                 variant="outlined"
                 dense
                 required
@@ -31,15 +43,12 @@
 </template>
 
 <script setup>
-import axios from 'axios';
+import axios from 'axios'
 import { ref, onMounted } from "vue"
 import { useToast } from "vue-toastification"
-// import { useRouter } from "vue-router"
-
 
 const toast = useToast()
-// const router = useRouter()
-const form = ref({ name: "" })
+const form = ref({ name: "", email: "" })
 const user = ref(null)
 
 // Fetch user profile
@@ -48,6 +57,7 @@ const getUser = async () => {
     const res = await axios.get("/api/user")
     user.value = res.data
     form.value.name = res.data.name
+    form.value.email = res.data.email
   } catch (err) {
     console.error("Error fetching user:", err)
   }
@@ -64,9 +74,8 @@ const updateProfile = async () => {
     toast.error("Failed to update profile")
   }
 }
-  onMounted(() =>
-  {
-  getUser()
-  })
 
+onMounted(() => {
+  getUser()
+})
 </script>
