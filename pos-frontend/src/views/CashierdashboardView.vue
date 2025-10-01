@@ -3,6 +3,7 @@
     <!-- App Bar -->
     <v-app-bar app color="blue" dense dark>
       <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
+        <v-btn text :to="{ path: '/profile' }">Profile</v-btn>
         <v-btn text @click="logout">Logout</v-btn>
     </v-app-bar>
 

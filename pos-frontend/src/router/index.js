@@ -6,6 +6,7 @@ import AdmindashboardView from '@/views/AdmindashboardView.vue'
 import CashierdashboardView from '@/views/CashierdashboardView.vue'
 import AdminSalesReportView from '@/views/AdminSalesReportView.vue'
 import ItemsSoldPageView from '@/views/ItemsSoldPageView.vue'
+import ProfilePageView from '@/views/ProfilePageView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,8 +17,8 @@ const router = createRouter({
     { path: '/admindashboard', component: AdmindashboardView, meta: { requiresAuth: true } },
     { path: '/cashierdashboard', component: CashierdashboardView, meta: { requiresAuth: true } },
     { path: '/adminsalesreport', component: AdminSalesReportView,},
-    { path: '/itemssoldpage/:id',component: ItemsSoldPageView,props: true }// ✅ Pass route params as props
-
+    { path: '/itemssoldpage/:id',component: ItemsSoldPageView,props: true },// ✅ Pass route params as props
+    { path: '/profile', component: ProfilePageView,}
   ],
 });
 
