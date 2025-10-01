@@ -5,6 +5,7 @@
        <v-btn text :to="{ path: '/profile' }">Profile</v-btn>
       <v-toolbar-title>GRIBZ SHOP</v-toolbar-title>
           <v-btn text :to="{ path: '/adminsalesreport' }">Sales Report</v-btn>
+          <v-btn text :to="{ path: '/allusers' }">All users</v-btn>
           <v-btn text color="white" @click="logout">Logout </v-btn>
     </v-app-bar>
   <v-main>

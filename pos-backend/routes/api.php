@@ -34,6 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    // fetch all users
+    Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
+
 
     // Update profile
     Route::put('/user', [UserController::class, 'update']);
