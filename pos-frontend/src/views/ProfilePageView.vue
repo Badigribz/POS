@@ -31,6 +31,14 @@
                 required
               />
 
+                            <v-text-field
+                v-model="form.phone"
+                label="Phone Number"
+                type="tel"
+                variant="outlined"
+                dense
+              />
+
               <!-- Password -->
               <v-text-field
                 v-model="form.password"
@@ -66,7 +74,13 @@ import { ref, onMounted } from "vue"
 import { useToast } from "vue-toastification"
 
 const toast = useToast()
-const form = ref({ name: "", email: "", password: "", password_confirmation: "" })
+const form = ref({
+name: "",
+email: "",
+phone: "",
+password: "",
+password_confirmation: "",
+ })
 const user = ref(null)
 
 // Fetch user profile
@@ -76,6 +90,7 @@ const getUser = async () => {
     user.value = res.data
     form.value.name = res.data.name
     form.value.email = res.data.email
+    form.value.phone = res.data.phone
   } catch (err) {
     console.error("Error fetching user:", err)
   }
