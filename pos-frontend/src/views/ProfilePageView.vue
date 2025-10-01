@@ -11,7 +11,21 @@
           <v-sheet class="mx-auto pa-6" max-width="600" elevation="12">
             <h1 class="text-2xl text-center font-bold mb-4">Update Profile</h1>
 
+            <v-avatar size="120" class="mx-auto mb-4">
+              <v-img v-if="user?.profile_picture_url" :src="user.profile_picture_url" />
+              <v-icon v-else size="64">mdi-account</v-icon>
+            </v-avatar>
+
+
             <v-form @submit.prevent="updateProfile">
+
+              <v-file-input
+                v-model="form.profile_picture"
+                label="Profile Picture"
+                accept="image/*"
+                prepend-icon="mdi-camera"
+              />
+
               <!-- Name -->
               <v-text-field
                 v-model="form.name"
@@ -97,16 +111,49 @@ const getUser = async () => {
 }
 
 // Update profile
+// const updateProfile = async () => {
+//   try {
+//     const res = await axios.put("/api/user", form.value)
+//     toast.success("Profile updated successfully")
+//     user.value = res.data.user // update local state
+//     // clear password fields after update
+//     form.value.password = ""
+//     form.value.password_confirmation = ""
+//   } catch (err) {
+//     console.error("Error updating profile:", err)
+//     toast.error("Failed to update profile")
+//   }
+// }
+
 const updateProfile = async () => {
   try {
-    const res = await axios.put("/api/user", form.value)
+    const formData = new FormData()
+    formData.append("name", form.value.name)
+    formData.append("email", form.value.email)
+    formData.append("phone", form.value.phone ?? "")
+
+    if (form.value.profile_picture instanceof File) {
+      formData.append("profile_picture", form.value.profile_picture)
+    }
+
+    if (form.value.password) {
+      formData.append("password", form.value.password)
+      formData.append("password_confirmation", form.value.password_confirmation)
+    }
+
+    // Laravel requires this for file upload + PUT
+    formData.append("_method", "PUT")
+
+    const res = await axios.post("/api/user", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    })
+
     toast.success("Profile updated successfully")
-    user.value = res.data.user // update local state
-    // clear password fields after update
-    form.value.password = ""
-    form.value.password_confirmation = ""
+    user.value = res.data.user
   } catch (err) {
-    console.error("Error updating profile:", err)
+    console.error("Error updating profile:", err.response?.data || err)
     toast.error("Failed to update profile")
   }
 }
